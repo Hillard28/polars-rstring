@@ -4,8 +4,7 @@ use polars::prelude::*;
 use polars::prelude::arity::binary_elementwise_values;
 use pyo3_polars::derive::polars_expr;
 
-// Optimized Levenshtein functions focusing on runtime speed.
-// Uses a two-row dynamic programming approach and operates on Unicode `char`s.
+// Compute simple Levenshtein distance function
 
 pub fn rdistance(a: &str, b: &str) -> usize {
     let a_chars: Vec<char> = a.chars().collect();
