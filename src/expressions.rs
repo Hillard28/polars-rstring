@@ -4,8 +4,7 @@ use polars::prelude::*;
 use polars::prelude::arity::binary_elementwise_values;
 use pyo3_polars::derive::polars_expr;
 
-// Compute simple Levenshtein distance function
-
+// Simple Levenshtein distance function
 pub fn rdistance(a: &str, b: &str) -> usize {
     let a_chars: Vec<char> = a.chars().collect();
     let b_chars: Vec<char> = b.chars().collect();
@@ -38,8 +37,8 @@ pub fn rdistance(a: &str, b: &str) -> usize {
     prev[m]
 }
 
-/// Returns the Levenshtein distance normalized to [0.0, 1.0].
-/// 0.0 means identical, 1.0 means completely different (relative to max length).
+// Simple Levenshtein distance normalized to [0.0, 1.0].
+// 0.0 means identical, 1.0 means completely different (relative to max length).
 pub fn rnormalized_distance(a: &str, b: &str) -> f64 {
     let d = rdistance(a, b) as f64;
     let max = a.chars().count().max(b.chars().count()) as f64;
@@ -50,13 +49,13 @@ pub fn rnormalized_distance(a: &str, b: &str) -> f64 {
     }
 }
 
-/// Returns a raw similarity score: max_length - distance.
+// Simple Levenshtein similarity score: max_length - distance.
 pub fn rsimilarity(a: &str, b: &str) -> usize {
     let max = a.chars().count().max(b.chars().count());
     max.saturating_sub(rdistance(a, b))
 }
 
-/// Returns similarity normalized to [0.0, 1.0].
+// Simple Levenshtein similarity normalized to [0.0, 1.0].
 pub fn rnormalized_similarity(a: &str, b: &str) -> f64 {
     let max = a.chars().count().max(b.chars().count()) as f64;
     if max == 0.0 {
@@ -66,11 +65,11 @@ pub fn rnormalized_similarity(a: &str, b: &str) -> f64 {
     }
 }
 
-/// Computes the minimal Levenshtein distance between the smaller of the
-/// two input strings and any contiguous substring of the larger string
-/// with the same character length as the smaller string. This effectively
-/// rolls the smaller string along the larger one and returns the best match
-/// distance (0 for an exact substring match).
+// Computes the minimal Levenshtein distance between the smaller of the
+// two input strings and any contiguous substring of the larger string
+// with the same character length as the smaller string. This effectively
+// rolls the smaller string along the larger one and returns the best match
+// distance (0 for an exact substring match).
 pub fn rpartial_distance(a: &str, b: &str) -> usize {
     let a_chars: Vec<char> = a.chars().collect();
     let b_chars: Vec<char> = b.chars().collect();
@@ -114,8 +113,8 @@ pub fn rpartial_distance(a: &str, b: &str) -> usize {
     min_dist
 }
 
-/// Returns the Levenshtein distance normalized to [0.0, 1.0].
-/// 0.0 means identical, 1.0 means completely different (relative to max length).
+// Levenshtein partial distance normalized to [0.0, 1.0].
+// 0.0 means identical, 1.0 means completely different (relative to max length).
 pub fn rnormalized_partial_distance(a: &str, b: &str) -> f64 {
     let d = rpartial_distance(a, b) as f64;
     let min = a.chars().count().min(b.chars().count()) as f64;
@@ -126,13 +125,13 @@ pub fn rnormalized_partial_distance(a: &str, b: &str) -> f64 {
     }
 }
 
-/// Returns a raw similarity score: max_length - distance.
+// Levenshtein partial similarity score: max_length - distance.
 pub fn rpartial_similarity(a: &str, b: &str) -> usize {
     let min = a.chars().count().min(b.chars().count());
     min.saturating_sub(rpartial_distance(a, b))
 }
 
-/// Returns similarity normalized to [0.0, 1.0].
+// Levenshtein partial similarity normalized to [0.0, 1.0].
 pub fn rnormalized_partial_similarity(a: &str, b: &str) -> f64 {
     let min = a.chars().count().min(b.chars().count()) as f64;
     if min == 0.0 {
@@ -141,6 +140,7 @@ pub fn rnormalized_partial_similarity(a: &str, b: &str) -> f64 {
         1.0 - (rpartial_distance(a, b) as f64 / min)
     }
 }
+
 
 #[polars_expr(output_type=Float64)]
 fn distance(inputs: &[Series]) -> PolarsResult<Series> {
